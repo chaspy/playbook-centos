@@ -1,0 +1,4 @@
+[http]
+        proxy = {{ httpproxy }}
+[https]
+        proxy = {{ httpproxy }}

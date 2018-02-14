@@ -1,0 +1,7 @@
+---
+- name: install easy_install
+  yum: name=python-setuptools state=latest
+- name: install pip
+  easy_install:
+    name: pip
+    state: latest

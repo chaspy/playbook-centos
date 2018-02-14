@@ -1,0 +1,9 @@
+[target_host]
+XX.XX.XX.XX
+
+[all:vars]
+httpproxy=http://<user:password>@<proxy-host-name>:<port>
+ansible_ssh_port=22
+ansible_ssh_user=root
+ansible_ssh_pass=password
+ansible_sudo_pass=password

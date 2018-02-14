@@ -1,0 +1,8 @@
+- name: copy proxy file
+  template: src=proxy.sh dest=/etc/profile.d/
+- name: copy gitconfig
+  template: src=gitconfig dest=/etc/
+- name: copy wgetrc
+  template: src=wgetrc dest=/etc/
+- name: add proxy setting to yum.conf
+  lineinfile: dest=/etc/yum.conf regexp="^proxy" line="proxy={{ httpproxy }}"

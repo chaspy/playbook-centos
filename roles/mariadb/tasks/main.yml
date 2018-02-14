@@ -1,0 +1,16 @@
+---
+- name: remove default package
+  yum: name={{ item }} state=absent
+  with_items:
+    - mariadb
+    - mariadb-libs
+- name: copy yum.repo file
+  template: src=MariaDB.repo dest=/etc/yum.repos.d/
+- name: install MariaDB
+  yum: name={{ item }} state=latest
+  with_items:
+    - MariaDB-client
+    - MariaDB-Galera-server
+    - galera
+- name: start mariadb
+  shell: /bin/bash /etc/init.d/mysql start

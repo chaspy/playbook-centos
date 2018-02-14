@@ -1,0 +1,7 @@
+---
+- name: install basic packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - wget
+- name: install rally
+  shell: wget -q -O- https://raw.githubusercontent.com/openstack/rally/master/install_rally.sh | bash

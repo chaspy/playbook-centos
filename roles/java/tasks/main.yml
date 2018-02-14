@@ -1,0 +1,5 @@
+---
+- name: install java8
+  yum: name={{ item }}
+  with_items: 
+    - java-1.8.0-openjdk

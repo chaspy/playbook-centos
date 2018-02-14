@@ -1,0 +1,20 @@
+---
+- name: install yum packages
+  yum: name={{ item }}
+  with_items:
+    - yum-utils
+- name: add docker repository
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: pip install docker-py
+  pip: name=docker-py
+- name: install yum packages
+  yum: name={{ item }}
+  with_items:
+    - docker-ce
+- name: run docker
+  systemd: name=docker state=started enabled=yes
+- name: proxy configure
+  template: src=docker.service dest=/etc/systemd/system/docker.service
+- name: restart docker(systemd)
+  shell: systemctl daemon-reload
+  notify: restart docker (systemd)

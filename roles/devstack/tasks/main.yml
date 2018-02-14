@@ -1,0 +1,35 @@
+---
+- name: add stack user
+  user: name=stack password=$1$Salt$krwRoI7KxeYXulS9tLmsJ/ group=wheel
+- name: no password configure
+  lineinfile:
+    dest: /etc/sudoers
+    line: 'stack ALL=(ALL) NOPASSWD: ALL'
+- name: check if firewalld is running
+  command: systemctl is-active firewalld
+  register: firewalld_result
+  changed_when: False
+  ignore_errors: True  # rc is 3 when firewalld is stopped
+- name: set the port state
+  firewalld: permanent=true port=80/tcp state=enabled immediate=true
+  notify: reload firewalld
+  when: firewalld_result.stdout == "active"
+- name: no_proxy setting
+  lineinfile: dest=/etc/profile.d/proxy.sh line='export no_proxy=localhost,127.0.0.1,{{ ansible_ens192.ipv4.address }}'
+- name: clone from github
+  git: repo=https://git.openstack.org/openstack-dev/devstack
+       dest=/home/stack/devstack
+  become: yes
+  become_user: stack
+- name: copy local.conf
+  template: src=local.conf dest=/home/stack/devstack
+  become: yes
+  become_user: stack
+#- name: install devstack
+#  shell: ./stack.sh
+#  args:
+#    chdir: /home/stack/devstack/
+#  become: yes
+#  become_user: stack
+#- name: start firewalld
+#  service: name=firewalld state=started

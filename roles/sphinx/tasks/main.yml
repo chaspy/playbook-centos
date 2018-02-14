@@ -1,0 +1,5 @@
+---
+- name: install sphinx
+  pip: name={{ item }} state=latest
+  with_items:
+    - sphinx

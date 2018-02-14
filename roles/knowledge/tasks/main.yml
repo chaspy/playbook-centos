@@ -1,0 +1,14 @@
+---
+- name: get knowledge
+  get_url: url=https://github.com/support-project/knowledge/releases/download/v1.10.0/knowledge.war dest=/var/lib/tomcat/webapps/
+- name: restart tomcat
+  systemd: name=tomcat state=restarted
+- name: check if firewalld is running
+  command: systemctl is-active firewalld
+  register: firewalld_result
+  changed_when: False
+  ignore_errors: True  # rc is 3 when firewalld is stopped
+- name: set the port state
+  firewalld: permanent=true port=8080/tcp state=enabled immediate=true
+  notify: reload firewalld
+  when: firewalld_result.stdout == "active"

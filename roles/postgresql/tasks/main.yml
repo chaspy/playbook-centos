@@ -1,0 +1,29 @@
+---
+- name: check if firewalld is running
+  command: systemctl is-active firewalld
+  register: firewalld_result
+  changed_when: False
+  ignore_errors: True  # rc is 3 when firewalld is stopped
+- name: set the port state
+  firewalld: permanent=true port=5432/tcp state=enabled immediate=true
+  notify: reload firewalld
+  when: firewalld_result.stdout == "active"
+- name: install postgresql
+  yum: name={{ item }}
+  with_items: 
+    - postgresql
+    - postgresql-server
+    - python-psycopg2
+- stat: path=/var/lib/pgsql/initdb.log
+  register: stat
+- name: initdb
+  shell: postgresql-setup initdb
+  when: not stat.stat.exists
+- name: copy pg_hba.conf
+  copy: src=pg_hba.conf dest=/var/lib/pgsql/data/pg_hba.conf
+- name: start postgresql
+  systemd: name=postgresql enabled=yes state=started
+- name: create knowuser
+  postgresql_user: name=knowuser
+- name: create db
+  postgresql_db: name=knowledge

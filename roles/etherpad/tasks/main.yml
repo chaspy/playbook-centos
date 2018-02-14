@@ -1,0 +1,36 @@
+---
+- name: add etherpad user
+  user: name=etherpad password="{{ 'etherpad' | password_hash('sha512') }}" group=wheel
+- name: no password configure
+  lineinfile:
+    dest: /etc/sudoers
+    line: 'etherpad ALL=(ALL) NOPASSWD: ALL'
+- name: check if firewalld is running
+  command: systemctl is-active firewalld
+  register: firewalld_result
+  changed_when: False
+  ignore_errors: True  # rc is 3 when firewalld is stopped
+- name: set the port state
+  firewalld: permanent=true port=9001/tcp state=enabled immediate=true
+  notify: reload firewalld
+  when: firewalld_result.stdout == "active"
+- name: install packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - gzip
+    - git
+    - curl
+    - python
+    - openssl-devel
+    - "@Development tools"
+- name: clone from github
+  git: repo=https://github.com/ether/etherpad-lite.git
+       dest=/home/etherpad/etherpad-life
+  become: yes
+  become_user: etherpad
+#- name: install deps & run
+#  shell: ./run.sh
+#  args:
+#    chdir: /home/etherpad/etherpad-life/bin/
+#  become: yes
+#  become_user: etherpad

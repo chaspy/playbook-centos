@@ -1,0 +1,18 @@
+---
+- name: install basic packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - gcc
+    - python-devel
+    - libffi-devel
+    - openssl-devel
+- name: install tempest and required packages
+  pip: name={{ item }} state=latest
+  with_items:
+    - tempest
+    - mock
+    - pep8
+    - oslotest
+- name: clone from github
+  git: repo=https://github.com/openstack/tempest.git
+       dest=/root/tempest/

@@ -1,0 +1,6 @@
+---
+- hosts: target_host
+  sudo: yes
+  roles:
+    - proxy
+    - git
